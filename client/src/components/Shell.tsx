@@ -1,0 +1,7 @@
+import { NavLink, Outlet } from 'react-router-dom';
+import { Activity, Inbox, CircleHelp, LogOut, Settings } from 'lucide-react';
+import { useAuth } from '../store/auth';
+export default function Shell({ brand, initials }: { brand: string; initials: string }) {
+  const { user, logout } = useAuth();
+  return <div className="app-frame"><aside className="sidebar"><div className="brand"><div className="brand-mark">{initials}</div><span>{brand}</span></div><div className="workspace-label">SUPPORT DESK</div><nav className="side-nav"><NavLink to="/" end><Activity size={17}/> Overview</NavLink><NavLink to="/tickets"><Inbox size={17}/> Tickets</NavLink></nav><div className="sidebar-bottom"><div className="sidebar-help"><CircleHelp size={16}/><span>AI drafts require review</span></div><div className="user-card"><div className="avatar">{(user?.name || 'U').slice(0,1).toUpperCase()}</div><div className="user-meta"><strong>{user?.name}</strong><small>{user?.email}</small></div><button className="icon-button" title="Sign out" onClick={logout}><LogOut size={17}/></button></div></div></aside><main className="main-area"><header className="topbar"><div className="crumb">Support desk <span>/</span> Workspace</div><div className="top-actions"><span className="ai-top-pill">AI assisted</span><button className="icon-button" title="Settings"><Settings size={18}/></button><div className="avatar avatar-small">{(user?.name || 'U').slice(0,1).toUpperCase()}</div></div></header><div className="page-content"><Outlet/></div></main></div>;
+}

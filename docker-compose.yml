@@ -1,0 +1,37 @@
+services:
+  mongo:
+    image: mongo:7
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_DATABASE: supportflow_ai
+    volumes:
+      - supportflow-mongo:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  api:
+    build: ./server
+    restart: unless-stopped
+    env_file:
+      - ./server/.env
+    environment:
+      NODE_ENV: development
+      PORT: 4002
+      MONGODB_URI: mongodb://mongo:27017/supportflow_ai
+      CORS_ORIGIN: http://localhost:8082
+      APP_TITLE: SupportFlow AI API
+    ports: ["4002:4002"]
+    depends_on:
+      mongo:
+        condition: service_healthy
+  web:
+    build:
+      context: ./client
+      args:
+        VITE_API_URL: http://localhost:4002/api
+    ports: ["8082:80"]
+    depends_on: [api]
+volumes:
+  supportflow-mongo:
